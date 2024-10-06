@@ -51,27 +51,25 @@ app.delete('/delete/:id', async(req,res) => {
 	}
 })
 
-app.put('/update/:id', async(req,res) => {
-	const { id } = req.params
-	const { name, price, description, quantity } = req.body
+app.put('/update/:id', async (req, res) => {
+    const { id } = req.params;
+    const { name, price, description, quantity } = req.body;
 
-	try {
-		const updateProduct = await Product.update(
-			{name, price, description, quantity},
-			{where: { id: id}}
-		)
-		
-		if(updateProduct[0] === 0 ){
-			return res.status(404).json({ error: 'Produto não encontrado'})
-		}
+    try {
+        const product = await Product.findByPk(id);
+        if (!product) {
+            return res.status(404).json({ error: 'Produto não encontrado' });
+        }
 
-		res.status(200).json({ message: 'Produto atualizado com sucesso'})
-		
-	} catch (error) {
-		console.error('Erro ao atualizar produto', error)
-		res.status(500).json({error: 'Erro ao atualizar produto'})
-	}
-})
+        await product.update({ name, price, description, quantity });
+        res.status(200).json({ message: 'Produto atualizado com sucesso' });
+        
+    } catch (error) {
+        console.error('Erro ao atualizar produto', error);
+        res.status(500).json({ error: 'Erro ao atualizar produto' });
+    }
+});
+
 
 sequelize.sync()
   .then(() => {
