@@ -3,12 +3,16 @@ import Navbar from "../components/NavBar";
 import ProductCard from "../components/ProductCard";
 import axios from "axios";
 import Toast from "../components/ToastAlert"; 
+import ModalUpdate from "../components/ModalUpdate";
 
 const Home = () => {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState([]);
   const [toastMessage, setToastMessage] = useState(null);
   const [toastType, setToastType] = useState("");
+
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [currentProduct, setCurrentProduct] = useState(null)
 
   const fetchProducts = async () => {
     try {
@@ -23,6 +27,7 @@ const Home = () => {
     fetchProducts();
   }, []);
 
+  ///selecionar produto
   const handleSelectProduct = (id) => {
     if (selectedProduct.includes(id)) {
       setSelectedProduct(
@@ -54,31 +59,33 @@ const Home = () => {
       setToastType("error");
     }
   };
-  const handleEditSelected = async () => {
-    try {
-      await Promise.all(
-        selectedProduct.map((id) =>
-          axios.put(`http://localhost:3000/update/${id}`, {
-            name: "Novo Nome",
-            price: 100,
-          })
-        )
-      );
-  
-      const updatedProducts = await axios.get("http://localhost:3000");
-      setProducts(updatedProducts.data);
-  
-      setSelectedProduct([]);
-      setToastMessage("Produto(s) editado(s) com sucesso!");
-      setToastType("success");
-    } catch (error) {
-      console.error("Erro ao editar produto:", error);
-      setToastMessage("Erro ao editar produto(s).");
-      setToastType("error");
+
+  const handleEditSelected = (product) => {
+    if (product) {
+      setCurrentProduct(product);
+      setIsModalOpen(true);
     }
   };
   
 
+
+  const handleEditProduct = async (updatedProduct) => {
+    try {
+      console.log("Atualizando produto:", updatedProduct); 
+      await axios.put(`http://localhost:3000/update/${updatedProduct.id}`, updatedProduct);
+      const updatedProducts = await axios.get("http://localhost:3000");
+      setProducts(updatedProducts.data);
+      setIsModalOpen(false); 
+      setToastMessage("Produto editado com sucesso!");
+      setToastType("success");
+    } catch (error) {
+      console.error("Erro ao editar produto:", error.response || error.message);
+      setToastMessage("Erro ao editar produto.");
+      setToastType("error");
+    }
+  };
+  
+  
   useEffect(() => {
     if (toastMessage) {
       const timer = setTimeout(() => {
@@ -93,7 +100,6 @@ const Home = () => {
     <div className="bg-gray-100 h-screen w-screen">
       <Navbar />
 
-      {/* Exibe o componente Toast se houver uma mensagem */}
       {toastMessage && (
         <Toast alert={toastMessage} type={toastType} />
       )}
@@ -104,8 +110,9 @@ const Home = () => {
         </h1>
         <div className="flex justify-end gap-4">
           <button
-            onClick={handleEditSelected}
-            disabled={selectedProduct.length === 0}
+            onClick={() => handleEditSelected(products.find(p => p.id === selectedProduct[0]))} 
+            disabled={selectedProduct.length !== 1}        
+
             className="p-2 bg-gray-200 rounded-lg hover:bg-gray-300 duration-300 transition-all">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -151,6 +158,13 @@ const Home = () => {
           ))}
         </div>
       </div>
+
+      <ModalUpdate 
+        isOpen={isModalOpen}
+        toggleModal={() => setIsModalOpen(false)}
+        product={currentProduct}
+        onEdit={handleEditProduct}
+      />
     </div>
   );
 };
