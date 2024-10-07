@@ -142,6 +142,7 @@ const Home = () => {
         <div className="mt-16 grid grid-cols-4 gap-8">
           {products.map((product) => (
             <ProductCard
+              link={'/detail'}
               onSelect={() => handleSelectProduct(product.id)}
               isSelected={selectedProduct.includes(product.id)}
               key={product.id}

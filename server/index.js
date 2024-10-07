@@ -9,7 +9,6 @@ const port = 3000;
 app.use(cors());
 app.use(express.json());
 
-
 app.get('/', async (req, res) => {
     try {
         const products = await Product.findAll();
@@ -20,17 +19,23 @@ app.get('/', async (req, res) => {
     }
 });
 
+
 app.post('/add', async (req, res) => {
     try {
         const product = await Product.create(req.body);
         console.log('Produto adicionado:', product);
-        res.status(201).json(product);
-		
+        
+        res.status(201).json({
+            product, 
+            redirectUrl: 'http://localhost:3000/' 
+        });
+
     } catch (error) {
         console.error('Erro ao adicionar produto:', error);
         res.status(500).json({ error: 'Erro ao adicionar produto' });
     }
 });
+
 
 
 app.delete('/delete/:id', async(req,res) => {
@@ -67,6 +72,20 @@ app.put('/update/:id', async (req, res) => {
     } catch (error) {
         console.error('Erro ao atualizar produto', error);
         res.status(500).json({ error: 'Erro ao atualizar produto' });
+    }
+});
+
+app.get('/produtos/:id', async (req, res) => {
+    const { id } = req.params; 
+    try {
+        const product = await Product.findByPk(id); 
+        if (!product) {
+            return res.status(404).json({ error: 'Produto não encontrado' }); 
+        }
+        res.status(200).json(product); 
+    } catch (error) {
+        console.error('Erro ao buscar produto:', error);
+        res.status(500).json({ error: 'Erro ao buscar produto' });
     }
 });
 
