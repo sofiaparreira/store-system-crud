@@ -27,7 +27,7 @@ app.post('/add', async (req, res) => {
         
         res.status(201).json({
             product, 
-            redirectUrl: 'http://localhost:3000/' 
+            redirectUrl: '/' 
         });
 
     } catch (error) {

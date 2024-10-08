@@ -1,26 +1,31 @@
 import React, { useState } from "react";
-import axios from 'axios'; 
+import axios from 'axios';
 import InputDefault from "./InputDefault";
+import { useNavigate } from "react-router-dom";
 
-const FormTemplate = ({ fetchProducts }) => { 
+const FormTemplate = ({ fetchProducts }) => {
     const [name, setName] = useState("");
     const [price, setPrice] = useState(0.0);
     const [quantity, setQuantity] = useState(0);
     const [description, setDescription] = useState("");
+    const navigate = useNavigate()
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const newProduct = { name, price: parseFloat(price), quantity, description }; 
+        const newProduct = { name, price: parseFloat(price), quantity, description };
 
         try {
-            await axios.post('http://localhost:3000/add', newProduct); 
-            fetchProducts(); 
+            await axios.post('http://localhost:3000/add', newProduct);
+            fetchProducts();
             setName('');
             setPrice(0.0);
             setQuantity(0);
             setDescription('');
+            navigate('/')
         } catch (error) {
             console.log('Erro ao adicionar produto no front', error);
+
+            navigate('/')
         }
     };
 
@@ -43,13 +48,23 @@ const FormTemplate = ({ fetchProducts }) => {
                             <InputDefault
                                 text={"Price"}
                                 type={"text"}
-                                onChange={(e) => setPrice(e.target.value)} // Corrigido para setPrice
+                                onChange={(e) => setPrice(e.target.value)}
                             />
                             <InputDefault
                                 text={"Quantity"}
                                 type={"number"}
                                 onChange={(e) => setQuantity(e.target.value)}
                             />
+                            <div className="flex flex-col justify-center">
+                                <label className='text-gray-700 font-medium text-sm' htmlFor="">Categoria</label>
+                                <select className='text-gray-700 px-8 ring-gray-300 ring-1 rounded py-1 focus:ring-indigo-600 outline-none mt-2'name="" id="">
+                                    <option value="alimentos">Alimentos</option>
+                                    <option value="eletronicos">Eletrônicos</option>
+                                    <option value="roupas">Roupas</option>
+                                    <option value="livros">Livros</option>
+                                    <option value="eletrodomesticos">Eletrodomésticos</option>
+                                </select>
+                            </div>
                         </div>
 
                         <div className="mt-2">
@@ -72,7 +87,7 @@ const FormTemplate = ({ fetchProducts }) => {
                         </div>
                     </div>
 
-                    
+
                 </div>
             </div>
 
