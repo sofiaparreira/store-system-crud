@@ -4,6 +4,7 @@ import ProductCard from "../components/ProductCard";
 import axios from "axios";
 import Toast from "../components/ToastAlert";
 import ModalUpdate from "../components/ModalUpdate";
+import DonutChart from "react-donut-chart";
 
 const Home = () => {
   const [products, setProducts] = useState([]);
@@ -12,8 +13,7 @@ const Home = () => {
   const [toastType, setToastType] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentProduct, setCurrentProduct] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState("all"); // Estado para categoria selecionada
-
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const fetchProducts = async () => {
     try {
       const response = await axios.get("http://localhost:3000");
@@ -94,9 +94,10 @@ const Home = () => {
   }, [toastMessage]);
 
   // Filtrando produtos pela categoria selecionada
-  const filteredProducts = selectedCategory === "all" 
-    ? products 
-    : products.filter(product => product.category === selectedCategory);
+  const filteredProducts =
+    selectedCategory === "all"
+      ? products
+      : products.filter((product) => product.category === selectedCategory);
 
   return (
     <div className="bg-gray-100 h-screen w-screen">
@@ -104,13 +105,24 @@ const Home = () => {
 
       {toastMessage && <Toast alert={toastMessage} type={toastType} />}
 
+      <div>
+        <span className="grid grid-cols-2 gap-32 mx-32">
+        <div className="bg-white rounded">
+
+</div>
+
+        </span>
+      </div>
       <div className="mx-52">
         <div className="flex justify-between items-center mt-8 gap-16 my-8 border-b border-gray-300">
           <h1 className="py-1 text-gray-800 font-semibold mb-4">
             ALL PRODUCTS
           </h1>
 
-          <select onChange={(e) => setSelectedCategory(e.target.value)} value={selectedCategory}>
+          <select
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            value={selectedCategory}
+          >
             <option value="all">Todos</option>
             <option value="automotivo">Automotivo</option>
             <option value="eletronico">Eletrônicos</option>
@@ -121,7 +133,7 @@ const Home = () => {
         </div>
 
         <div className="flex justify-end gap-4">
-        <button
+          <button
             onClick={() =>
               handleEditSelected(
                 products.find((p) => p.id === selectedProduct[0])
