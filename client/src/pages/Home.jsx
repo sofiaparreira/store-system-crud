@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Navbar from "../components/NavBar";
 import ProductCard from "../components/ProductCard";
 import axios from "axios";
-import Toast from "../components/ToastAlert"; 
+import Toast from "../components/ToastAlert";
 import ModalUpdate from "../components/ModalUpdate";
 
 const Home = () => {
@@ -10,9 +10,9 @@ const Home = () => {
   const [selectedProduct, setSelectedProduct] = useState([]);
   const [toastMessage, setToastMessage] = useState(null);
   const [toastType, setToastType] = useState("");
-
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [currentProduct, setCurrentProduct] = useState(null)
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentProduct, setCurrentProduct] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState("all"); // Estado para categoria selecionada
 
   const fetchProducts = async () => {
     try {
@@ -27,7 +27,6 @@ const Home = () => {
     fetchProducts();
   }, []);
 
-  ///selecionar produto
   const handleSelectProduct = (id) => {
     if (selectedProduct.includes(id)) {
       setSelectedProduct(
@@ -54,7 +53,6 @@ const Home = () => {
       setToastType("success");
     } catch (error) {
       console.error("Erro ao remover produtos:", error);
-
       setToastMessage("Erro ao remover produtos.");
       setToastType("error");
     }
@@ -66,16 +64,16 @@ const Home = () => {
       setIsModalOpen(true);
     }
   };
-  
-
 
   const handleEditProduct = async (updatedProduct) => {
     try {
-      console.log("Atualizando produto:", updatedProduct); 
-      await axios.put(`http://localhost:3000/update/${updatedProduct.id}`, updatedProduct);
+      await axios.put(
+        `http://localhost:3000/update/${updatedProduct.id}`,
+        updatedProduct
+      );
       const updatedProducts = await axios.get("http://localhost:3000");
       setProducts(updatedProducts.data);
-      setIsModalOpen(false); 
+      setIsModalOpen(false);
       setToastMessage("Produto editado com sucesso!");
       setToastType("success");
     } catch (error) {
@@ -84,36 +82,54 @@ const Home = () => {
       setToastType("error");
     }
   };
-  
-  
+
   useEffect(() => {
     if (toastMessage) {
       const timer = setTimeout(() => {
         setToastMessage(null);
       }, 5000);
 
-      return () => clearTimeout(timer); 
+      return () => clearTimeout(timer);
     }
   }, [toastMessage]);
+
+  // Filtrando produtos pela categoria selecionada
+  const filteredProducts = selectedCategory === "all" 
+    ? products 
+    : products.filter(product => product.category === selectedCategory);
 
   return (
     <div className="bg-gray-100 h-screen w-screen">
       <Navbar />
 
-      {toastMessage && (
-        <Toast alert={toastMessage} type={toastType} />
-      )}
+      {toastMessage && <Toast alert={toastMessage} type={toastType} />}
 
       <div className="mx-52">
-        <h1 className="mt-8 border-b border-gray-300 py-3 text-gray-800 font-semibold mb-4">
-          ALL PRODUCTS
-        </h1>
-        <div className="flex justify-end gap-4">
-          <button
-            onClick={() => handleEditSelected(products.find(p => p.id === selectedProduct[0]))} 
-            disabled={selectedProduct.length !== 1}        
+        <div className="flex justify-between items-center mt-8 gap-16 my-8 border-b border-gray-300">
+          <h1 className="py-1 text-gray-800 font-semibold mb-4">
+            ALL PRODUCTS
+          </h1>
 
-            className="p-2 bg-gray-200 rounded-lg hover:bg-gray-300 duration-300 transition-all">
+          <select onChange={(e) => setSelectedCategory(e.target.value)} value={selectedCategory}>
+            <option value="all">Todos</option>
+            <option value="automotivo">Automotivo</option>
+            <option value="eletronico">Eletrônicos</option>
+            <option value="eletrodomestico">Eletrodomesticos</option>
+            <option value="livro">Livros</option>
+            <option value="outros">Outros</option>
+          </select>
+        </div>
+
+        <div className="flex justify-end gap-4">
+        <button
+            onClick={() =>
+              handleEditSelected(
+                products.find((p) => p.id === selectedProduct[0])
+              )
+            }
+            disabled={selectedProduct.length !== 1}
+            className="p-2 bg-gray-200 rounded-lg hover:bg-gray-300 duration-300 transition-all"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               height="22"
@@ -147,9 +163,9 @@ const Home = () => {
         </div>
 
         <div className="mt-16 grid grid-cols-4 gap-8">
-          {products.map((product) => (
+          {filteredProducts.map((product) => (
             <ProductCard
-              link={'/detail'}
+              link={"/detail"}
               onSelect={() => handleSelectProduct(product.id)}
               isSelected={selectedProduct.includes(product.id)}
               key={product.id}
@@ -159,7 +175,7 @@ const Home = () => {
         </div>
       </div>
 
-      <ModalUpdate 
+      <ModalUpdate
         isOpen={isModalOpen}
         toggleModal={() => setIsModalOpen(false)}
         product={currentProduct}

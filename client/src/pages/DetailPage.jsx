@@ -56,6 +56,7 @@ const DetailPage = () => {
           >
             {product.name}
           </h1>
+          <p className="text-sm text-gray-500 first-letter:uppercase mt-1 mb-8">{product.category}</p>
           <div class="mt-4 sm:items-center sm:gap-4 sm:flex">
             <p
               class="text-2xl font-extrabold text-indigo-600 sm:text-3xl"
