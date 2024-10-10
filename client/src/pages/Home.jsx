@@ -4,7 +4,8 @@ import ProductCard from "../components/ProductCard";
 import axios from "axios";
 import Toast from "../components/ToastAlert";
 import ModalUpdate from "../components/ModalUpdate";
-import DonutChart from "react-donut-chart";
+import BarChart from "../charts/BarChart";
+
 
 const Home = () => {
   const [products, setProducts] = useState([]);
@@ -14,6 +15,8 @@ const Home = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentProduct, setCurrentProduct] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState("all");
+
+
   const fetchProducts = async () => {
     try {
       const response = await axios.get("http://localhost:3000");
@@ -93,14 +96,13 @@ const Home = () => {
     }
   }, [toastMessage]);
 
-  // Filtrando produtos pela categoria selecionada
   const filteredProducts =
     selectedCategory === "all"
       ? products
       : products.filter((product) => product.category === selectedCategory);
 
   return (
-    <div className="bg-gray-100 h-screen w-screen">
+    <div className="bg-gray-100 min-h-screen">
       <Navbar />
 
       {toastMessage && <Toast alert={toastMessage} type={toastType} />}
@@ -185,7 +187,14 @@ const Home = () => {
             />
           ))}
         </div>
+
+
+        <div className="w-1/2 mt-32 p-8 bg-white rounded-md">
+          <BarChart/>
+        </div>
+
       </div>
+
 
       <ModalUpdate
         isOpen={isModalOpen}
